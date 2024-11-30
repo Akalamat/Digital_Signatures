@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.backends import default_backend
 
-# Tải chữ ký
+# Load the public key
 with open('public_key.pem', 'rb') as f:
     public_pem = f.read()
     public_key = serialization.load_pem_public_key(
@@ -27,7 +27,7 @@ def verify_files(directory):
         try:
             content, signature = file_content.split(b'\n---SIGNATURE---\n')
         except ValueError:
-            results.append(f"       - Tệp tin {filename} không chứa chữ ký số 😮")
+            results.append(f"       - File {filename} does not contain a digital signature 😮")
             continue
 
         try:
@@ -40,9 +40,9 @@ def verify_files(directory):
                 ),
                 hashes.SHA256()
             )
-            results.append(f"       - Tệp tin {filename} xác thực thành công ☻ ")
+            results.append(f"       - File {filename} verified successfully ☻")
         except Exception as e:
-            results.append(f"       - Tệp tin {filename} xác thực thất bại 🙁 {e}")
+            results.append(f"       - File {filename} verification failed 🙁 {e}")
     return results
 
 def read_binary_signature(file_path):
@@ -68,28 +68,28 @@ def select_file():
         signature = read_binary_signature(file_path)
         result_text.delete(1.0, tk.END)
         if signature:
-            result_text.insert(tk.END, f"Chữ ký trong tệp tin {os.path.basename(file_path)}: {signature.hex()}\n", "big_font")
+            result_text.insert(tk.END, f"Signature in file {os.path.basename(file_path)}: {signature.hex()}\n", "big_font")
         else:
-            result_text.insert(tk.END, f"Không tìm thấy chữ ký trong tệp tin {os.path.basename(file_path)}\n", "big_font")
+            result_text.insert(tk.END, f"No signature found in file {os.path.basename(file_path)}\n", "big_font")
 
-# Tạo màn hình chính
+# Create the main application window
 root = tk.Tk()
-root.title("Xác thực tệp tin")
+root.title("File Verification")
 
-# Nút chọn thư mục cần xác thực
-select_button = tk.Button(root, text="Chọn thư mục", command=select_directory)
+# Button to select a directory for verification
+select_button = tk.Button(root, text="Select Directory", command=select_directory)
 select_button.pack(pady=10)
 
-# Nút chọn tệp tin để đọc chữ ký
-read_signature_button = tk.Button(root, text="Đọc chữ ký từ tệp tin", command=select_file)
+# Button to select a file for reading the signature
+read_signature_button = tk.Button(root, text="Read Signature from File", command=select_file)
 read_signature_button.pack(pady=10)
 
-# Tạo văn bản để hiển thị kết quả
+# Text widget to display results
 result_text = tk.Text(root, height=35, width=120)
 result_text.pack(pady=10)
 
-# Font chữ lớn
+# Configure large font
 result_text.tag_configure("big_font", font=("Helvetica", 16))
 
-# Thực thi
+# Run the application
 root.mainloop()
